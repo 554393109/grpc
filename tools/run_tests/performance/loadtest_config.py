@@ -26,16 +26,15 @@ import collections
 import copy
 import datetime
 import itertools
+import json
 import os
 import string
 import sys
-import uuid
-
 from typing import Any, Dict, Iterable, Mapping, Optional, Type
 
-import json
 import yaml
 
+sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 import scenario_config
 import scenario_config_exporter
 
@@ -113,10 +112,10 @@ def gen_run_indices(runs_per_test: int) -> Iterable[str]:
     if runs_per_test < 2:
         yield ''
         return
-    prefix_length = len('{:d}'.format(runs_per_test - 1))
-    prefix_fmt = '{{:{:d}d}}'.format(prefix_length)
+    index_length = len('{:d}'.format(runs_per_test - 1))
+    index_fmt = '{{:0{:d}d}}'.format(index_length)
     for i in range(runs_per_test):
-        yield prefix_fmt.format(i)
+        yield index_fmt.format(i)
 
 
 def gen_loadtest_configs(

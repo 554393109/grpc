@@ -16,12 +16,11 @@
  *
  */
 
-#include "src/core/lib/iomgr/port.h"
-
 #include "src/core/lib/iomgr/buffer_list.h"
 
 #include <grpc/grpc.h>
 
+#include "src/core/lib/iomgr/port.h"
 #include "test/core/util/test_config.h"
 
 #ifdef GRPC_LINUX_ERRQUEUE
@@ -122,7 +121,7 @@ static void TestTcpBufferList() {
 }
 
 int main(int argc, char** argv) {
-  grpc::testing::TestEnvironment env(argc, argv);
+  grpc::testing::TestEnvironment env(&argc, argv);
   grpc_init();
   TestTcpBufferList();
   grpc_shutdown();

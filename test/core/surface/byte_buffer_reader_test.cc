@@ -16,11 +16,12 @@
  *
  */
 
+#include <string.h>
+
 #include <grpc/byte_buffer.h>
 #include <grpc/byte_buffer_reader.h>
 #include <grpc/grpc.h>
 #include <grpc/slice.h>
-
 #include <grpc/support/alloc.h>
 #include <grpc/support/log.h>
 #include <grpc/support/time.h>
@@ -28,8 +29,6 @@
 #include "src/core/lib/gprpp/thd.h"
 #include "src/core/lib/iomgr/exec_ctx.h"
 #include "test/core/util/test_config.h"
-
-#include <string.h>
 
 #define LOG_TEST(x) gpr_log(GPR_INFO, "%s", x)
 
@@ -265,7 +264,7 @@ static void test_byte_buffer_copy(void) {
 
 int main(int argc, char** argv) {
   grpc_init();
-  grpc::testing::TestEnvironment env(argc, argv);
+  grpc::testing::TestEnvironment env(&argc, argv);
   test_read_one_slice();
   test_read_one_slice_malloc();
   test_read_none_compressed_slice();

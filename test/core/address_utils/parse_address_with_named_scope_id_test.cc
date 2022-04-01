@@ -16,10 +16,6 @@
  *
  */
 
-#include "src/core/lib/address_utils/parse_address.h"
-#include "src/core/lib/address_utils/sockaddr_utils.h"
-#include "src/core/lib/iomgr/sockaddr.h"
-
 #include <net/if.h>
 #include <string.h>
 #ifdef GRPC_HAVE_UNIX_SOCKET
@@ -31,9 +27,12 @@
 #include <grpc/grpc.h>
 #include <grpc/support/log.h>
 
+#include "src/core/lib/address_utils/parse_address.h"
+#include "src/core/lib/address_utils/sockaddr_utils.h"
 #include "src/core/lib/gprpp/host_port.h"
 #include "src/core/lib/gprpp/memory.h"
 #include "src/core/lib/iomgr/exec_ctx.h"
+#include "src/core/lib/iomgr/sockaddr.h"
 #include "src/core/lib/iomgr/socket_utils.h"
 #include "test/core/util/test_config.h"
 
@@ -99,7 +98,7 @@ struct sockaddr_in6 resolve_with_gettaddrinfo(const char* uri_text) {
 }
 
 int main(int argc, char** argv) {
-  grpc::testing::TestEnvironment env(argc, argv);
+  grpc::testing::TestEnvironment env(&argc, argv);
   grpc_init();
   char* arbitrary_interface_name = static_cast<char*>(gpr_zalloc(IF_NAMESIZE));
   // Per RFC 3493, an interface index is a "small positive integer starts at 1".

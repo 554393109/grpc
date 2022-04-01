@@ -21,12 +21,11 @@
    gpr_cpu_current_cpu()
 */
 
-#include <grpc/support/cpu.h>
-
 #include <stdio.h>
 #include <string.h>
 
 #include <grpc/support/alloc.h>
+#include <grpc/support/cpu.h>
 #include <grpc/support/log.h>
 #include <grpc/support/sync.h>
 #include <grpc/support/time.h>
@@ -146,7 +145,7 @@ static void cpu_test(void) {
 }
 
 int main(int argc, char* argv[]) {
-  grpc::testing::TestEnvironment env(argc, argv);
+  grpc::testing::TestEnvironment env(&argc, argv);
   cpu_test();
   return 0;
 }

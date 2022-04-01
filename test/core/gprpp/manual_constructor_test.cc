@@ -19,12 +19,15 @@
 /* Test of gpr synchronization support. */
 
 #include "src/core/lib/gprpp/manual_constructor.h"
+
+#include <stdio.h>
+#include <stdlib.h>
+
+#include <cstring>
+
 #include <grpc/support/alloc.h>
 #include <grpc/support/log.h>
 #include <grpc/support/sync.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <cstring>
 
 #include "test/core/util/test_config.h"
 
@@ -90,7 +93,7 @@ static void complex_test() {
 /* ------------------------------------------------- */
 
 int main(int argc, char* argv[]) {
-  grpc::testing::TestEnvironment env(argc, argv);
+  grpc::testing::TestEnvironment env(&argc, argv);
   basic_test();
   complex_test();
   return 0;

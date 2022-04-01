@@ -18,11 +18,14 @@ spec:
         app: ${deployment_name}
         owner: xds-k8s-interop-test
     spec:
+      % if service_account_name:
       serviceAccountName: ${service_account_name}
+      % endif
       containers:
       - name: ${deployment_name}
         image: ${image_name}
         imagePullPolicy: Always
+        restartPolicy: Never
         args:
           - "--port=${test_port}"
         ports:

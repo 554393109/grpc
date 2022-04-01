@@ -18,14 +18,15 @@
 
 /* Test of gpr time support. */
 
-#include <grpc/support/log.h>
-#include <grpc/support/sync.h>
-#include <grpc/support/time.h>
 #include <inttypes.h>
 #include <limits.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+
+#include <grpc/support/log.h>
+#include <grpc/support/sync.h>
+#include <grpc/support/time.h>
 
 #include "test/core/util/test_config.h"
 
@@ -254,7 +255,7 @@ static void test_cmp_extreme(void) {
 }
 
 int main(int argc, char* argv[]) {
-  grpc::testing::TestEnvironment env(argc, argv);
+  grpc::testing::TestEnvironment env(&argc, argv);
 
   test_values();
   test_add_sub();

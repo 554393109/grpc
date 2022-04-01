@@ -23,6 +23,7 @@
 
 #include <grpc/grpc.h>
 #include <grpcpp/channel.h>
+
 #include "src/proto/grpc/testing/messages.pb.h"
 #include "src/proto/grpc/testing/test.grpc.pb.h"
 
@@ -70,7 +71,6 @@ class InteropClient {
   bool DoCustomMetadata();
   bool DoUnimplementedMethod();
   bool DoUnimplementedService();
-  bool DoCacheableUnary();
   // all requests are sent to one server despite multiple servers are resolved
   bool DoPickFirstUnary();
 

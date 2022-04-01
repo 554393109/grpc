@@ -16,13 +16,14 @@
  *
  */
 
+#include "test/core/util/cmdline.h"
+
 #include <string.h>
 
 #include <grpc/support/alloc.h>
 #include <grpc/support/log.h>
 
 #include "src/core/lib/gpr/useful.h"
-#include "test/core/util/cmdline.h"
 #include "test/core/util/test_config.h"
 
 #define LOG_TEST() gpr_log(GPR_INFO, "test at %s:%d", __FILE__, __LINE__)
@@ -465,7 +466,7 @@ static void test_badargs4(void) {
 }
 
 int main(int argc, char** argv) {
-  grpc::testing::TestEnvironment env(argc, argv);
+  grpc::testing::TestEnvironment env(&argc, argv);
   test_simple_int();
   test_eq_int();
   test_2dash_int();

@@ -16,13 +16,14 @@
  *
  */
 
+#include "src/core/lib/gpr/env.h"
+
 #include <stdio.h>
 #include <string.h>
 
 #include <grpc/support/alloc.h>
 #include <grpc/support/log.h>
 
-#include "src/core/lib/gpr/env.h"
 #include "src/core/lib/gpr/string.h"
 #include "test/core/util/test_config.h"
 
@@ -56,7 +57,7 @@ static void test_unsetenv(void) {
 }
 
 int main(int argc, char** argv) {
-  grpc::testing::TestEnvironment env(argc, argv);
+  grpc::testing::TestEnvironment env(&argc, argv);
   test_setenv_getenv();
   test_unsetenv();
   return 0;

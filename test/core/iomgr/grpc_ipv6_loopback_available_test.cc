@@ -16,13 +16,10 @@
  *
  */
 
-#include "src/core/lib/iomgr/port.h"
-
-// grpc_ipv6_loopback_available isn't currently available on UV.
-#ifndef GRPC_UV
-
 #include <grpc/grpc.h>
 #include <grpc/support/log.h>
+
+#include "src/core/lib/iomgr/port.h"
 #include "test/core/util/test_config.h"
 
 #ifdef GPR_WINDOWS
@@ -32,7 +29,7 @@
 #endif
 
 int main(int argc, char** argv) {
-  grpc::testing::TestEnvironment env(argc, argv);
+  grpc::testing::TestEnvironment env(&argc, argv);
   grpc_init();
   // This test assumes that the ipv6 loopback is available
   // in all environments in which grpc tests run in.
@@ -40,9 +37,3 @@ int main(int argc, char** argv) {
   grpc_shutdown();
   return 0;
 }
-
-#else
-
-int main(int argc, char** argv) { return 0; }
-
-#endif /* GRPC_UV */

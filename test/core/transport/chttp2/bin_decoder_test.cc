@@ -23,6 +23,7 @@
 #include <grpc/grpc.h>
 #include <grpc/support/alloc.h>
 #include <grpc/support/log.h>
+
 #include "src/core/ext/transport/chttp2/transport/bin_encoder.h"
 #include "src/core/lib/gpr/string.h"
 #include "src/core/lib/iomgr/exec_ctx.h"
@@ -89,7 +90,7 @@ static size_t base64_infer_length(const char* s) {
       s, grpc_chttp2_base64_decode_with_length(base64_encode(s), strlen(s)));
 
 int main(int argc, char** argv) {
-  grpc::testing::TestEnvironment env(argc, argv);
+  grpc::testing::TestEnvironment env(&argc, argv);
   grpc_init();
   {
     grpc_core::ExecCtx exec_ctx;

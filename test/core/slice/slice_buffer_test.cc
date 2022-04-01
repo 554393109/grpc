@@ -19,6 +19,7 @@
 #include <grpc/grpc.h>
 #include <grpc/slice_buffer.h>
 #include <grpc/support/log.h>
+
 #include "src/core/lib/slice/slice_internal.h"
 #include "test/core/util/test_config.h"
 
@@ -148,7 +149,7 @@ void test_slice_buffer_first() {
 }
 
 int main(int argc, char** argv) {
-  grpc::testing::TestEnvironment env(argc, argv);
+  grpc::testing::TestEnvironment env(&argc, argv);
   grpc_init();
 
   test_slice_buffer_add();

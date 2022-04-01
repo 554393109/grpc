@@ -17,11 +17,13 @@
  */
 
 #include "src/core/lib/gpr/murmur_hash.h"
-#include <grpc/support/log.h>
-#include <grpc/support/string_util.h>
-#include "test/core/util/test_config.h"
 
 #include <string.h>
+
+#include <grpc/support/log.h>
+#include <grpc/support/string_util.h>
+
+#include "test/core/util/test_config.h"
 
 typedef uint32_t (*hash_func)(const void* key, size_t len, uint32_t seed);
 
@@ -64,7 +66,7 @@ static void verification_test(hash_func hash, uint32_t expected) {
 }
 
 int main(int argc, char** argv) {
-  grpc::testing::TestEnvironment env(argc, argv);
+  grpc::testing::TestEnvironment env(&argc, argv);
   /* basic tests to verify that things don't crash */
   gpr_murmur_hash3("", 0, 0);
   gpr_murmur_hash3("xyz", 3, 0);

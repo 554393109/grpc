@@ -16,6 +16,8 @@
  *
  */
 
+#include "test/cpp/interop/interop_client.h"
+
 #include <cinttypes>
 #include <fstream>
 #include <memory>
@@ -40,7 +42,6 @@
 #include "src/proto/grpc/testing/test.grpc.pb.h"
 #include "test/core/util/histogram.h"
 #include "test/cpp/interop/client_helper.h"
-#include "test/cpp/interop/interop_client.h"
 
 namespace grpc {
 namespace testing {
@@ -903,71 +904,6 @@ bool InteropClient::DoSpecialStatusMessage() {
   return true;
 }
 
-bool InteropClient::DoCacheableUnary() {
-  gpr_log(GPR_DEBUG, "Sending RPC with cacheable response");
-
-  // Create request with current timestamp
-  gpr_timespec ts = gpr_now(GPR_CLOCK_PRECISE);
-  std::string timestamp =
-      std::to_string(static_cast<long long unsigned>(ts.tv_nsec));
-  SimpleRequest request;
-  request.mutable_payload()->set_body(timestamp.c_str(), timestamp.size());
-
-  // Request 1
-  ClientContext context1;
-  SimpleResponse response1;
-  context1.set_cacheable(true);
-  // Add fake user IP since some proxy's (GFE) won't cache requests from
-  // localhost.
-  context1.AddMetadata("x-user-ip", "1.2.3.4");
-  Status s1 =
-      serviceStub_.Get()->CacheableUnaryCall(&context1, request, &response1);
-  if (!AssertStatusOk(s1, context1.debug_error_string())) {
-    return false;
-  }
-  gpr_log(GPR_DEBUG, "response 1 payload: %s",
-          response1.payload().body().c_str());
-
-  // Request 2
-  ClientContext context2;
-  SimpleResponse response2;
-  context2.set_cacheable(true);
-  context2.AddMetadata("x-user-ip", "1.2.3.4");
-  Status s2 =
-      serviceStub_.Get()->CacheableUnaryCall(&context2, request, &response2);
-  if (!AssertStatusOk(s2, context2.debug_error_string())) {
-    return false;
-  }
-  gpr_log(GPR_DEBUG, "response 2 payload: %s",
-          response2.payload().body().c_str());
-
-  // Check that the body is same for both requests. It will be the same if the
-  // second response is a cached copy of the first response
-  GPR_ASSERT(response2.payload().body() == response1.payload().body());
-
-  // Request 3
-  // Modify the request body so it will not get a cache hit
-  ts = gpr_now(GPR_CLOCK_PRECISE);
-  timestamp = std::to_string(static_cast<long long unsigned>(ts.tv_nsec));
-  SimpleRequest request1;
-  request1.mutable_payload()->set_body(timestamp.c_str(), timestamp.size());
-  ClientContext context3;
-  SimpleResponse response3;
-  context3.set_cacheable(true);
-  context3.AddMetadata("x-user-ip", "1.2.3.4");
-  Status s3 =
-      serviceStub_.Get()->CacheableUnaryCall(&context3, request1, &response3);
-  if (!AssertStatusOk(s3, context3.debug_error_string())) {
-    return false;
-  }
-  gpr_log(GPR_DEBUG, "response 3 payload: %s",
-          response3.payload().body().c_str());
-
-  // Check that the response is different from the previous response.
-  GPR_ASSERT(response3.payload().body() != response1.payload().body());
-  return true;
-}
-
 bool InteropClient::DoPickFirstUnary() {
   const int rpcCount = 100;
   SimpleRequest request;
@@ -1108,9 +1044,9 @@ InteropClient::PerformOneSoakTestIteration(
   if (!s.ok()) {
     return std::make_tuple(false, elapsed_ms, context.debug_error_string());
   } else if (elapsed_ms > max_acceptable_per_iteration_latency_ms) {
-    std::string debug_string =
-        absl::StrFormat("%d ms exceeds max acceptable latency: %d ms.",
-                        elapsed_ms, max_acceptable_per_iteration_latency_ms);
+    std::string debug_string = absl::StrFormat(
+        "%d ms exceeds max acceptable latency: %d ms, peer: %s", elapsed_ms,
+        max_acceptable_per_iteration_latency_ms, context.peer());
     return std::make_tuple(false, elapsed_ms, std::move(debug_string));
   } else {
     return std::make_tuple(true, elapsed_ms, "");

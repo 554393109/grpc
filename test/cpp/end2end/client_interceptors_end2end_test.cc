@@ -19,6 +19,8 @@
 #include <memory>
 #include <vector>
 
+#include <gtest/gtest.h>
+
 #include "absl/memory/memory.h"
 
 #include <grpcpp/channel.h>
@@ -44,10 +46,9 @@
 
 #ifdef GRPC_POSIX_SOCKET
 #include <fcntl.h>
+
 #include "src/core/lib/iomgr/socket_utils_posix.h"
 #endif /* GRPC_POSIX_SOCKET */
-
-#include <gtest/gtest.h>
 
 namespace grpc {
 namespace testing {
@@ -774,7 +775,7 @@ class ParameterizedClientInterceptorsEnd2endTest
   }
 
   ~ParameterizedClientInterceptorsEnd2endTest() override {
-    server_->Shutdown();
+    server_->Shutdown(grpc_timeout_milliseconds_to_deadline(0));
   }
 
   std::shared_ptr<grpc::Channel> CreateClientChannel(
@@ -1237,7 +1238,7 @@ TEST_F(ClientGlobalInterceptorEnd2endTest, HijackingGlobalInterceptor) {
 }  // namespace grpc
 
 int main(int argc, char** argv) {
-  grpc::testing::TestEnvironment env(argc, argv);
+  grpc::testing::TestEnvironment env(&argc, argv);
   ::testing::InitGoogleTest(&argc, argv);
   return RUN_ALL_TESTS();
 }

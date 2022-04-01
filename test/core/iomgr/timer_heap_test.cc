@@ -16,8 +16,6 @@
  *
  */
 
-#include "src/core/lib/iomgr/port.h"
-
 #include "src/core/lib/iomgr/timer_heap.h"
 
 #include <stdlib.h>
@@ -27,6 +25,7 @@
 #include <grpc/support/log.h>
 
 #include "src/core/lib/gpr/useful.h"
+#include "src/core/lib/iomgr/port.h"
 #include "test/core/util/test_config.h"
 
 static gpr_atm random_deadline(void) { return rand(); }
@@ -141,7 +140,7 @@ static elem_struct* search_elems(elem_struct* elems, size_t count,
   for (size_t i = 0; i < count * 2; i++) {
     size_t a = static_cast<size_t>(rand()) % count;
     size_t b = static_cast<size_t>(rand()) % count;
-    GPR_SWAP(size_t, search_order[a], search_order[b]);
+    std::swap(search_order[a], search_order[b]);
   }
   elem_struct* out = nullptr;
   for (size_t i = 0; out == nullptr && i < count; i++) {
@@ -204,7 +203,7 @@ static void test2(void) {
     }
 
     if (num_inserted) {
-      grpc_millis* min_deadline = nullptr;
+      int64_t* min_deadline = nullptr;
       for (size_t i = 0; i < elems_size; i++) {
         if (elems[i].inserted) {
           if (min_deadline == nullptr) {
@@ -286,7 +285,7 @@ static void shrink_test(void) {
 int main(int argc, char** argv) {
   int i;
 
-  grpc::testing::TestEnvironment env(argc, argv);
+  grpc::testing::TestEnvironment env(&argc, argv);
 
   for (i = 0; i < 5; i++) {
     test1();

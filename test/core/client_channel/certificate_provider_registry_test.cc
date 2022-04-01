@@ -18,9 +18,9 @@
 
 #include <grpc/support/port_platform.h>
 
-#include <gmock/gmock.h>
-
 #include "src/core/ext/xds/certificate_provider_registry.h"
+
+#include <gmock/gmock.h>
 
 #include "test/core/util/test_config.h"
 
@@ -84,7 +84,7 @@ TEST(CertificateProviderRegistryTest, Basic) {
 
 int main(int argc, char** argv) {
   ::testing::InitGoogleTest(&argc, argv);
-  grpc::testing::TestEnvironment env(argc, argv);
+  grpc::testing::TestEnvironment env(&argc, argv);
   auto result = RUN_ALL_TESTS();
   return result;
 }

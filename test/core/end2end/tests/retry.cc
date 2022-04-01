@@ -16,8 +16,6 @@
  *
  */
 
-#include "test/core/end2end/end2end_tests.h"
-
 #include <stdio.h>
 #include <string.h>
 
@@ -32,9 +30,8 @@
 #include "src/core/lib/gpr/string.h"
 #include "src/core/lib/gpr/useful.h"
 #include "src/core/lib/iomgr/exec_ctx.h"
-#include "src/core/lib/transport/static_metadata.h"
-
 #include "test/core/end2end/cq_verifier.h"
+#include "test/core/end2end/end2end_tests.h"
 #include "test/core/end2end/tests/cancel_test_helpers.h"
 
 static void* tag(intptr_t t) { return reinterpret_cast<void*>(t); }
@@ -68,11 +65,12 @@ static void drain_cq(grpc_completion_queue* cq) {
 
 static void shutdown_server(grpc_end2end_test_fixture* f) {
   if (!f->server) return;
-  grpc_server_shutdown_and_notify(f->server, f->shutdown_cq, tag(1000));
-  GPR_ASSERT(grpc_completion_queue_pluck(f->shutdown_cq, tag(1000),
-                                         grpc_timeout_seconds_to_deadline(5),
-                                         nullptr)
-                 .type == GRPC_OP_COMPLETE);
+  grpc_server_shutdown_and_notify(f->server, f->cq, tag(1000));
+  grpc_event ev;
+  do {
+    ev = grpc_completion_queue_next(f->cq, grpc_timeout_seconds_to_deadline(5),
+                                    nullptr);
+  } while (ev.type != GRPC_OP_COMPLETE || ev.tag != tag(1000));
   grpc_server_destroy(f->server);
   f->server = nullptr;
 }
@@ -90,7 +88,6 @@ static void end_test(grpc_end2end_test_fixture* f) {
   grpc_completion_queue_shutdown(f->cq);
   drain_cq(f->cq);
   grpc_completion_queue_destroy(f->cq);
-  grpc_completion_queue_destroy(f->shutdown_cq);
 }
 
 // Tests a basic retry scenario:
@@ -121,8 +118,6 @@ static void test_retry(grpc_end2end_test_config config) {
   char* peer;
 
   grpc_arg args[] = {
-      grpc_channel_arg_integer_create(
-          const_cast<char*>(GRPC_ARG_ENABLE_RETRIES), 1),
       grpc_channel_arg_string_create(
           const_cast<char*>(GRPC_ARG_SERVICE_CONFIG),
           const_cast<char*>(
@@ -199,8 +194,9 @@ static void test_retry(grpc_end2end_test_config config) {
   // Make sure the "grpc-previous-rpc-attempts" header was not sent in the
   // initial attempt.
   for (size_t i = 0; i < request_metadata_recv.count; ++i) {
-    GPR_ASSERT(!grpc_slice_eq(request_metadata_recv.metadata[i].key,
-                              GRPC_MDSTR_GRPC_PREVIOUS_RPC_ATTEMPTS));
+    GPR_ASSERT(!grpc_slice_eq(
+        request_metadata_recv.metadata[i].key,
+        grpc_slice_from_static_string("grpc-previous-rpc-attempts")));
   }
 
   peer = grpc_call_get_peer(s);
@@ -248,10 +244,11 @@ static void test_retry(grpc_end2end_test_config config) {
   // Make sure the "grpc-previous-rpc-attempts" header was sent in the retry.
   bool found_retry_header = false;
   for (size_t i = 0; i < request_metadata_recv.count; ++i) {
-    if (grpc_slice_eq(request_metadata_recv.metadata[i].key,
-                      GRPC_MDSTR_GRPC_PREVIOUS_RPC_ATTEMPTS)) {
-      GPR_ASSERT(
-          grpc_slice_eq(request_metadata_recv.metadata[i].value, GRPC_MDSTR_1));
+    if (grpc_slice_eq(
+            request_metadata_recv.metadata[i].key,
+            grpc_slice_from_static_string("grpc-previous-rpc-attempts"))) {
+      GPR_ASSERT(grpc_slice_eq(request_metadata_recv.metadata[i].value,
+                               grpc_slice_from_static_string("1")));
       found_retry_header = true;
       break;
     }

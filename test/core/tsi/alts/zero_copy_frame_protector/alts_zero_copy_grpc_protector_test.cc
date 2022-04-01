@@ -16,6 +16,8 @@
  *
  */
 
+#include "src/core/tsi/alts/zero_copy_frame_protector/alts_zero_copy_grpc_protector.h"
+
 #include <grpc/slice_buffer.h>
 #include <grpc/support/alloc.h>
 #include <grpc/support/log.h>
@@ -23,7 +25,6 @@
 #include "src/core/lib/iomgr/exec_ctx.h"
 #include "src/core/lib/slice/slice_internal.h"
 #include "src/core/tsi/alts/crypt/gsec.h"
-#include "src/core/tsi/alts/zero_copy_frame_protector/alts_zero_copy_grpc_protector.h"
 #include "src/core/tsi/transport_security_grpc.h"
 #include "test/core/tsi/alts/crypt/gsec_test_util.h"
 #include "test/core/util/test_config.h"
@@ -297,7 +298,7 @@ static void alts_zero_copy_protector_seal_unseal_large_buffer_tests(
 }
 
 int main(int argc, char** argv) {
-  grpc::testing::TestEnvironment env(argc, argv);
+  grpc::testing::TestEnvironment env(&argc, argv);
   grpc_init();
   alts_zero_copy_protector_seal_unseal_small_buffer_tests(
       /*enable_extra_copy=*/false);

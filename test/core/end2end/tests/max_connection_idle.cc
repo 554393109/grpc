@@ -16,8 +16,6 @@
  *
  */
 
-#include "test/core/end2end/end2end_tests.h"
-
 #include <limits.h>
 #include <string.h>
 
@@ -28,6 +26,7 @@
 
 #include "src/core/lib/gpr/useful.h"
 #include "test/core/end2end/cq_verifier.h"
+#include "test/core/end2end/end2end_tests.h"
 
 #define MAX_CONNECTION_IDLE_MS 500
 #define MAX_CONNECTION_AGE_MS 9999
@@ -226,7 +225,6 @@ static void test_max_connection_idle(grpc_end2end_test_config config) {
   grpc_completion_queue_shutdown(f.cq);
   drain_cq(f.cq);
   grpc_completion_queue_destroy(f.cq);
-  grpc_completion_queue_destroy(f.shutdown_cq);
   config.tear_down_data(&f);
 
   cq_verifier_destroy(cqv);

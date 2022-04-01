@@ -16,8 +16,6 @@
  *
  */
 
-#include "test/core/end2end/end2end_tests.h"
-
 #include <grpc/support/log.h>
 #include <grpc/support/sync.h>
 #include <grpc/support/time.h>
@@ -26,6 +24,7 @@
 #include "src/core/lib/gpr/useful.h"
 #include "src/core/lib/surface/channel.h"
 #include "test/core/end2end/cq_verifier.h"
+#include "test/core/end2end/end2end_tests.h"
 
 #define PING_NUM 5
 
@@ -96,8 +95,6 @@ static void test_ping(grpc_end2end_test_config config,
   grpc_completion_queue_shutdown(f.cq);
   grpc_completion_queue_destroy(f.cq);
 
-  /* f.shutdown_cq is not used in this test */
-  grpc_completion_queue_destroy(f.shutdown_cq);
   config.tear_down_data(&f);
 
   cq_verifier_destroy(cqv);
